@@ -1,0 +1,86 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+main{
+   margin: 0 5%;
+   font-family: Arial, Helvetica, sans-serif;
+}
+main h1{
+    margin: 50px 0;
+    text-align: center;
+    font-size: 36px;
+}
+
+.container{
+    display: flex;
+
+    justify-content: space-around;
+    
+}
+
+.paises{
+    width: 40%;
+    height: auto;
+    padding: 10px;
+    border: 1px solid #404040;
+    border-radius: 5px;
+
+}
+
+.paises h3, .favorit h3{
+    margin: 10px 0;
+}
+
+.favorit{
+    width: 40%;
+    border-radius: 4px;
+    padding: 10px;
+    border: 1px solid #404040;
+    border-radius: 5px; 
+}
+
+.county{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.county input{
+   width: 45px;
+   height: 45px;
+   background: #068a4f;
+   border-radius: 5px;
+   margin-right: 10px;
+   color: white;
+   font-weight: bold;
+   font-size: 22px;
+   border: 0;
+}
+
+.county img{
+    width: 60px;
+    height: 60px;
+    margin-right: 10px;
+    border-radius: 50%;
+}
+
+.county div{
+    margin: 5px 0;
+}
+
+.county ul{
+    list-style: none;
+    font-size: 18px;
+}
+
+.county li{
+    padding-bottom: 5px;
+}
+
+.tab-favorites .btn-favorite{
+    background: #ab0000;
+}
+
