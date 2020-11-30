@@ -153,7 +153,8 @@ function addToFavorrites(id){
     })
 
     allCountries = allCountries.filter(country => country.id !== id);
-
+    console.log(allCountries.length)
+    console.log(favoriteCountries.length)
     render();
 }
 
@@ -175,3 +176,4 @@ function removeToFavorrites(id){
 function formatNumber(number){
     return numberFormat.format(number)
 }
+
