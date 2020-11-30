@@ -1,179 +1,129 @@
-let tabCountries = null;
-let tabFavorites = null;
 
-let allCountries = [];
-let favoriteCountries = [];
+let personGlobal = [];
 
-let countCountries = 0;
-let countFavorites = 0;
+let inputText = document.querySelector('#input-text');
+let btnBusca = document.querySelector('#btn-busca');
+let personSelect = document.querySelector('#person');
+let selectEstatis = document.querySelector('#statistic');
+let clearEstatistic = document.querySelector("#estatisiticas .titulo");
+const filter = document.querySelector('#usuarios .titulo');
 
-let totalPopulationList = 0;
-let totalPopulationFavorites = 0;
-
-let numberFormat = null;
-
-window.addEventListener('load', () =>{
-    tabCountries = document.querySelector('.tab-paises');
-    tabFavorites = document.querySelector('.tab-favorites');
-    countCountries = document.querySelector('.paises h2 span');
-    countFavorites = document.querySelector('.favorit h2 span');
-
-    totalPopulationList = document.querySelector('.paises h3 span');
-    totalPopulationFavorites = document.querySelector('.favorit h3 span');
-
-    numberFormat = Intl.NumberFormat('pt-BR')
-
+window.addEventListener('load', ()=> {
     fetchCountries();
 });
 
-async function fetchCountries(){
-    const res = await fetch('https://restcountries.eu/rest/v2/all');
-    const json = await res.json();
+async function fetchCountries(){  
+    //const res = await fetch('http://localhost:3000/persons');
+    const res = await fetch('https://randomuser.me/api/?seed=javascript&results=100&nat=BR&noinfo');
+    const jsonn = await res.json();
 
-    allCountries = json.map(country => {
-        const {numericCode, translations, population, flag } = country;
-        return {
-            name: translations.br,
-            population,
-            flag,
-            id: numericCode ,
-            formattedPopulation : formatNumber(population)
-        };
-    });
-
-    render();
+    person = jsonn.results.map(person =>{
+     const {name, picture, dob, gender} = person;
+     return {
+        age: dob.age,
+        gender,
+        large: picture.large,
+        nameComplete: `${name.first} ${name.last}`
+     }
+    })
+    personGlobal = person;
+    handlePersonButtons();
 }
 
 function render(){
-    renderCountryList();
-    renderFavorites();
-    renderSummary();
-
-    handleCountryButtons();
-
+    renderPerson()
+    serchPerson()
+    renderIstatistic()
 }
 
-function renderCountryList(){
-    let contriesHTML = "<div>";
-
-    allCountries.forEach(country => {
-        const {id, name, flag, formattedPopulation } = country;
-        
-        const countryHTML =`
-        <div class='county'>
-            <div>
-                <input id="${id}" type="button" value="+">
-            </div>
-            <div>
-                <img src="${flag}" alt"${name}">
-            </div>
-            <div>
-                <ul>
-                    <li>${name}</li>
-                    <li>${formattedPopulation}</li>
-                </ul>
-            </div>
-        </div>  
-        `;
-
-        contriesHTML += countryHTML
+function renderIstatistic(){
+    const TotalMan = person.filter(person =>{
+        return person.gender == "male"
     })
 
-    contriesHTML += "</div>"
+    const TotalFamale = person.filter(person =>{
+        return person.gender == "female"
+    })
 
-    tabCountries.innerHTML = contriesHTML
-}
-
-function renderFavorites(){
-    let favoriteHTML = '<div>'
-    favoriteCountries.forEach(country => {
-        const {id, name, formattedPopulation, flag } = country;
-
-        const FavoritecountryHTML =`
-        <div class='county'>
-            <div>
-                <input id="${id}" class="btn-favorite" type="button" value="-">
-            </div>
-            <div>
-                <img src="${flag}" alt"${name}">
-            </div>
-            <div>
-                <ul>
-                    <li>${name}</li>
-                    <li>${formattedPopulation}</li>
-                </ul>
-            </div>
-        </div>  
-        `;
-
-        favoriteHTML += FavoritecountryHTML;
-    });
-
-    tabFavorites.innerHTML =  favoriteHTML 
-
-}
-function renderSummary(){
-    countCountries.textContent = allCountries.length;
-    countFavorites.textContent = favoriteCountries.length;
-
-    const totalPopulation = allCountries.reduce((accumulator, current) => {
-        return accumulator + current.population;
+    const totalAges = person.reduce((accumulator, current) =>{
+        return accumulator + current.age;
     }, 0);
 
-    const totalFavorites = favoriteCountries.reduce((accumulator, current) => {
-        return accumulator + current.population;
-    }, 0);
+    const mediaIdade = totalAges / person.length;
 
-    totalPopulationList.textContent = formatNumber(totalPopulation);
-    totalPopulationFavorites.textContent = formatNumber(totalFavorites);
+    if(person.length > 0){
+        selectEstatis.innerHTML =`
+            <ul>
+                <li> Sexo marsculino: ${TotalMan.length} </li>
+                <li> Sexo feminino: ${TotalFamale.length} </li>
+                <li> Soma das idades: ${totalAges} </li>
+                <li> Media das idades: ${mediaIdade.toFixed(0)} </li>
+            </ul>
+        `;
+    }
+    clearEstatistic.innerHTML = "Estatistica";
 }
 
-function handleCountryButtons(){
-    const countryButtons = Array.from(tabCountries.querySelectorAll('input'));
-    const favoriteButtons = Array.from(tabFavorites.querySelectorAll('input'));
-    
-    countryButtons.forEach(button => {
-        button.addEventListener('click', () => addToFavorrites(button.id));
-    });
+function renderPerson(){
+    let peopleHTML = "<div>"
 
-    favoriteButtons.forEach(button => {
-        button.addEventListener('click', () => removeToFavorrites(button.id));
-    });
-}
-
-
-function addToFavorrites(id){
-    //find busca o elemento
-    const countryToAdd = allCountries.find(button => button.id === id);
-    favoriteCountries = [...favoriteCountries, countryToAdd];
-
-    //sort usado para ordenar
-    favoriteCountries.sort((a, b) => {
-        return a.name.localeCompare(b.name);
+    person.forEach(person =>{
+        const {nameComplete, age, large} = person;
+        const personHTML= `
+        <div class="container-person">
+            <img src="${large}">
+            <p> ${nameComplete}, ${age} anos
+        </div>
+        `;
+        peopleHTML += personHTML;
     })
-
-    allCountries = allCountries.filter(country => country.id !== id);
-    console.log(allCountries.length)
-    console.log(favoriteCountries.length)
-    render();
+    peopleHTML += "</div>"
+    personSelect.innerHTML = peopleHTML;
 }
 
-function removeToFavorrites(id){
-    //find busca o elemento
-    const countryToRemove = favoriteCountries.find(button => button.id === id);
-    allCountries = [...allCountries, countryToRemove];
+function serchPerson(){
+    totalPerson = person.length
+    if(person.length > 0){
+        filter.textContent =`
+        ${totalPerson} usuários(s) encontrado(s)
+        `;
+    } 
+}
 
-    //sort usado para ordenar
-    allCountries.sort((a, b) => {
-        return a.name.localeCompare(b.name);
-    })
+function handlePersonButtons(){
+    inputText.addEventListener('keypress', captureEventEnter)
+    btnBusca.addEventListener('click', captureEventBuscar)
+}
 
-    favoriteCountries = favoriteCountries.filter(country => country.id !== id);
+function captureEventEnter(event){
+    if(inputText.value.length > 0){
+        if(event.key === "Enter"){
+            personText(inputText.value)
+        }
+    }else{
+        clear()
+    }
+}
+
+function captureEventBuscar(event){
+    if(inputText.value.length > 0){
+        personText(inputText.value)
+    }else{
+        clear()
+    }
+}
+
+function personText(caracter){
+    person = personGlobal.filter(person =>{
+        return person.nameComplete.toLowerCase().includes(caracter.toLowerCase())
+    });
 
     render();
 }
 
-function formatNumber(number){
-    return numberFormat.format(number)
+function clear(){
+    personSelect.innerHTML = "";
+    selectEstatis.innerHTML = "";
+    filter.textContent = "Nemhum usuário filtrado";
+    clearEstatistic.textContent = "Sem dados para mostrar"
 }
-
